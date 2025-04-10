@@ -2,24 +2,53 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Музыка по настроению</title>
+  <title>Кантри Гитара</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.js"></script>
 </head>
 <body style="text-align:center; font-family:sans-serif; background:linear-gradient(to bottom, #fffde7, #fff59d);">
-  <h1>Создай свою музыку</h1>
+  <h1>Создай кантри музыку</h1>
   <button onclick="playMusic()">Играть музыку</button>
   <audio id="windSound" src="https://cdn.pixabay.com/audio/2022/03/11/audio_61f94e06c8.mp3" loop></audio>
+
   <script>
     async function playMusic() {
       await Tone.start();
-      document.getElementById('windSound').volume = 0.3;
-      document.getElementById('windSound').play();
-      const synth = new Tone.PolySynth().toDestination();
+
+      // Запускаем фоновый ветер
+      const wind = document.getElementById('windSound');
+      wind.volume = 0.2;
+      wind.play();
+
+      // Гитара (сэмплер через пианино, можно заменить на гитарные сэмплы)
+      const guitar = new Tone.Sampler({
+        urls: {
+          "C3": "C3.mp3",
+          "D#3": "Ds3.mp3",
+          "F#3": "Fs3.mp3",
+          "A3": "A3.mp3",
+        },
+        baseUrl: "https://tonejs.github.io/audio/salamander/", 
+      }).toDestination();
+
+      // Бочка (ударный инструмент)
+      const kick = new Tone.MembraneSynth().toDestination();
+
       const now = Tone.now();
-      let notes = ["C5", "E5", "G5", "B5"];
-      for (let i = 0; i < 20; i++) {
-        let note = notes[Math.floor(Math.random() * notes.length)];
-        synth.triggerAttackRelease(note, "2n", now + i * 0.5);
+      const chords = [
+        ["C4", "E4", "G4"], // C аккорд
+        ["G3", "B3", "D4"], // G аккорд
+        ["A3", "C4", "E4"], // Am аккорд
+        ["F3", "A3", "C4"], // F аккорд
+      ];
+
+      let time = now;
+      
+      // Играем аккорды и ставим бит
+      for (let i = 0; i < 8; i++) {
+        let chord = chords[i % chords.length];
+        guitar.triggerAttackRelease(chord, "2n", time);
+        kick.triggerAttackRelease("C1", "8n", time); // лёгкий удар
+        time += 1.5; // темп кантри
       }
     }
   </script>
