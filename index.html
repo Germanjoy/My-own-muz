@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Музыка по настроению</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.js"></script>
+</head>
+<body style="text-align:center; font-family:sans-serif; background:linear-gradient(to bottom, #fffde7, #fff59d);">
+  <h1>Создай свою музыку</h1>
+  <button onclick="playMusic()">Играть музыку</button>
+  <audio id="windSound" src="https://cdn.pixabay.com/audio/2022/03/11/audio_61f94e06c8.mp3" loop></audio>
+  <script>
+    async function playMusic() {
+      await Tone.start();
+      document.getElementById('windSound').volume = 0.3;
+      document.getElementById('windSound').play();
+      const synth = new Tone.PolySynth().toDestination();
+      const now = Tone.now();
+      let notes = ["C5", "E5", "G5", "B5"];
+      for (let i = 0; i < 20; i++) {
+        let note = notes[Math.floor(Math.random() * notes.length)];
+        synth.triggerAttackRelease(note, "2n", now + i * 0.5);
+      }
+    }
+  </script>
+</body>
+</html>
