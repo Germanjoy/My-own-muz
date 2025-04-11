@@ -2,34 +2,26 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Кантри-гитара</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.js"></script>
+  <title>Кантри-гитара реальная</title>
 </head>
 <body style="text-align:center; font-family:sans-serif; background:linear-gradient(to bottom, #fffde7, #fff59d);">
-  <h1>Кантри музыка</h1>
-  <button onclick="playCountryMusic()">Играть кантри</button>
+  <h1>Настоящая кантри-гитара</h1>
 
+  <audio id="countryMusic" src="https://cdn.pixabay.com/audio/2022/03/04/audio_bf63a2b27f.mp3"></audio>
   <audio id="windSound" src="https://cdn.pixabay.com/audio/2022/03/11/audio_61f94e06c8.mp3" loop></audio>
 
-  <script>
-    async function playCountryMusic() {
-      await Tone.start();
+  <button onclick="playMusic()">Играть кантри музыку!</button>
 
-      // Запустить ветер
+  <script>
+    function playMusic() {
+      const music = document.getElementById('countryMusic');
       const wind = document.getElementById('windSound');
+
       wind.volume = 0.2;
       wind.play();
 
-      // Лёгкая симуляция гитары
-      const guitar = new Tone.PluckSynth().toDestination();
-
-      const now = Tone.now();
-      const notes = ["C4", "E4", "G4", "B4", "A3", "D4"];
-
-      // Играем ноты как кантри
-      for (let i = 0; i < notes.length; i++) {
-        guitar.triggerAttack(notes[i], now + i * 0.8);
-      }
+      music.volume = 1;
+      music.play();
     }
   </script>
 </body>
