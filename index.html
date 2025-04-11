@@ -1,129 +1,87 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Создай свою музыку</title>
+  <title>Мой Groovepad</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.js"></script>
   <style>
     body {
+      background: linear-gradient(to bottom, #e1f5fe, #b3e5fc);
       text-align: center;
       font-family: sans-serif;
-      background: linear-gradient(to bottom, #e0f7fa, #b2ebf2);
       padding: 20px;
     }
-    button, select {
+    h1 {
+      margin-bottom: 30px;
+    }
+    .pad {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
       margin: 10px;
-      padding: 15px 30px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
+      border-radius: 20px;
       background-color: #4fc3f7;
       color: white;
+      font-size: 18px;
+      line-height: 100px;
       cursor: pointer;
+      user-select: none;
+      transition: 0.3s;
     }
-    button:hover {
+    .pad.active {
       background-color: #0288d1;
     }
   </style>
 </head>
 <body>
+
   <h1>Создай свою музыку</h1>
 
-  <h2>Выбери инструменты:</h2>
-  <label><input type="checkbox" id="guitar"> Гитара</label><br>
-  <label><input type="checkbox" id="piano"> Пианино</label><br>
-  <label><input type="checkbox" id="drums"> Ударные</label><br>
-  <label><input type="checkbox" id="bass"> Бас-гитара</label><br>
-  <label><input type="checkbox" id="flute"> Флейта</label><br>
-  <label><input type="checkbox" id="bigDrum"> Большой барабан</label><br>
-
-  <h2>Выбери жанр:</h2>
-  <select id="genre">
-    <option value="country">Кантри</option>
-    <option value="pop">Поп</option>
-    <option value="ambient">Эмбиент</option>
-  </select>
-
-  <h2>Выбери настроение:</h2>
-  <select id="mood">
-    <option value="happy">Радостное</option>
-    <option value="calm">Спокойное</option>
-    <option value="energetic">Энергичное</option>
-    <option value="dreamy">Мечтательное</option>
-  </select>
-
-  <br><br>
-  <button onclick="playMusic()">Создать музыку</button>
+  <div id="pads">
+    <div class="pad" onclick="toggleSound('guitar')">Гитара</div>
+    <div class="pad" onclick="toggleSound('piano')">Пианино</div>
+    <div class="pad" onclick="toggleSound('drums')">Ударные</div>
+    <div class="pad" onclick="toggleSound('bass')">Бас</div>
+    <div class="pad" onclick="toggleSound('flute')">Флейта</div>
+    <div class="pad" onclick="toggleSound('bigDrum')">Бочка</div>
+  </div>
 
   <script>
-    async function playMusic() {
+    const players = {
+      guitar: new Tone.Player("https://cdn.pixabay.com/audio/2022/03/04/audio_bf63a2b27f.mp3").toDestination(),
+      piano: new Tone.Player("https://cdn.pixabay.com/audio/2022/03/04/audio_fdb0b8e1e4.mp3").toDestination(),
+      drums: new Tone.Player("https://cdn.pixabay.com/audio/2021/09/27/audio_2e4e5f4e41.mp3").toDestination(),
+      bass: new Tone.Player("https://cdn.pixabay.com/audio/2022/03/15/audio_78f6f891f1.mp3").toDestination(),
+      flute: new Tone.Player("https://cdn.pixabay.com/audio/2022/05/02/audio_4512b9d8a0.mp3").toDestination(),
+      bigDrum: new Tone.Player("https://cdn.pixabay.com/audio/2021/12/23/audio_0b7c962aad.mp3").toDestination()
+    };
+
+    const padStates = {
+      guitar: false,
+      piano: false,
+      drums: false,
+      bass: false,
+      flute: false,
+      bigDrum: false
+    };
+
+    async function toggleSound(instrument) {
       await Tone.start();
+      const pad = document.querySelector(`.pad[onclick="toggleSound('${instrument}')"]`);
 
-      const selectedInstruments = {
-        guitar: document.getElementById('guitar').checked,
-        piano: document.getElementById('piano').checked,
-        drums: document.getElementById('drums').checked,
-        bass: document.getElementById('bass').checked,
-        flute: document.getElementById('flute').checked,
-        bigDrum: document.getElementById('bigDrum').checked
-      };
-
-      const genre = document.getElementById('genre').value;
-      const mood = document.getElementById('mood').value;
-
-      let bpm = 100; // Темп по умолчанию
-
-      // Меняем темп в зависимости от настроения
-      if (mood === "happy") bpm = 140;
-      if (mood === "calm") bpm = 70;
-      if (mood === "energetic") bpm = 110;
-      if (mood === "dreamy") bpm = 80;
-
-      Tone.Transport.bpm.value = bpm;
-
-      // Очищаем все старые события
-      Tone.Transport.cancel();
-
-      // Проигрываем выбранные инструменты
-      let time = Tone.now();
-
-      if (selectedInstruments.guitar) {
-        const guitar = new Tone.Synth().toDestination();
-        guitar.triggerAttackRelease("C4", "2n", time);
+      if (!padStates[instrument]) {
+        players[instrument].loop = true;
+        players[instrument].start();
+        pad.classList.add("active");
+      } else {
+        players[instrument].stop();
+        pad.classList.remove("active");
       }
 
-      if (selectedInstruments.piano) {
-        const piano = new Tone.Synth({ oscillator: { type: "triangle" } }).toDestination();
-        piano.triggerAttackRelease("E4", "2n", time + 0.5);
-      }
-
-      if (selectedInstruments.drums) {
-        const drum = new Tone.MembraneSynth().toDestination();
-        drum.triggerAttackRelease("C2", "8n", time + 1);
-      }
-
-      if (selectedInstruments.bass) {
-        const bass = new Tone.MonoSynth({
-          oscillator: { type: "square" },
-          filter: { Q: 4, type: "lowpass", rolloff: -24 },
-          envelope: { attack: 0.1, decay: 0.3, sustain: 0.7, release: 1 }
-        }).toDestination();
-        bass.triggerAttackRelease("C2", "1n", time + 1.5);
-      }
-
-      if (selectedInstruments.flute) {
-        const flute = new Tone.Synth({ oscillator: { type: "sine" } }).toDestination();
-        flute.triggerAttackRelease("G4", "2n", time + 2);
-      }
-
-      if (selectedInstruments.bigDrum) {
-        const bigDrum = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4 }).toDestination();
-        bigDrum.triggerAttackRelease("C1", "4n", time + 2.5);
-      }
-
-      // Пуск
-      Tone.Transport.start();
+      padStates[instrument] = !padStates[instrument];
     }
   </script>
+
 </body>
 </html>
